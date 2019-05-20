@@ -24,42 +24,51 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// ServiceSpec defines the desired state of Service
-type ServiceSpec struct {
+// ModuleSpec defines the desired state of Module
+type ModuleSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// +kubebuilder:validation:Minimum=0
+	Source   string          `json:"source"`
+	Image    string          `json:"image"`
 	Replicas int             `json:"replicas"`
 	Flavor   string          `json:"flavor"`
-	Version  string          `json:"version"`
-	Tags     []string        `json:"tags,omitempty"`
+	Action   string          `json:"action"`
 	Env      []corev1.EnvVar `json:"env,omitempty"`
 }
 
-// ServiceStatus defines the observed state of Service
-type ServiceStatus struct {
+// ModuleStatus defines the observed state of Module
+type ModuleStatus struct {
+	Phase           string `json:"phase"`
+	Replicas        int    `json:"replicas"`
+	CurrentReplicas int    `json:"currentReplicas"`
+	UpdatedReplicas int    `json:"updatedReplicas"`
 }
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// Service is the Schema for the services API
+// Module is the Schema for the modules API
 // +k8s:openapi-gen=true
-// +kubebuilder:subresource:scale:specpath=.spec.replicas,statuspath=.status.replicas
-type Service struct {
+// +kubebuilder:printcolumn:name="Service",type="string",JSONPath=".metadata.ownerReferences[0].name",description="the parent service.core.automium.io"
+// +kubebuilder:printcolumn:name="Status",type="string",JSONPath=".status.phase",description="the execution phase"
+// +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=".status.updatedReplicas",description="Ready node replicas"
+// +kubebuilder:printcolumn:name="Requested",type="string",JSONPath=".status.replicas",description="Requested node replicas"
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
+// +kubebuilder:subresource:status
+type Module struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ServiceSpec   `json:"spec,omitempty"`
-	Status ServiceStatus `json:"status,omitempty"`
+	Spec   ModuleSpec   `json:"spec,omitempty"`
+	Status ModuleStatus `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// ServiceList contains a list of Service
-type ServiceList struct {
+// ModuleList contains a list of Module
+type ModuleList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Service `json:"items"`
+	Items           []Module `json:"items"`
 }
 

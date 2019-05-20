@@ -39,32 +39,18 @@ type NodePropertiesStatusSpec struct {
 	Node          string `json:"node"`
 	Address       string `json:"address"`
 	PublicAddress string `json:"publicAddress"`
+	Image         string `json:"image"`
 }
-
-// NodeServiceStatusSpec contains the basic data of service on a node obtained from Consul
-// type NodeServiceStatusSpec struct {
-// 	ID      string `json:"id"`
-// 	Service string `json:"service"`
-// 	Port    int    `json:"port"`
-// 	Address string `json:"address"`
-// }
-
-// NodeServicesStatusSpec is a struct which contains the service name and the service data obtained from Consul
-// type NodeServicesStatusSpec struct {
-// 	ServiceName string                `json:"serviceName"`
-// 	ServiceData NodeServiceStatusSpec `json:"serviceData"`
-// }
 
 // NodeSpec defines the desired state of Node
 type NodeSpec struct {
-	Hostname string `json:"hostname"`
-    DeletionDate string `json:"deletionDate"`
+	Hostname     string `json:"hostname"`
+	DeletionDate string `json:"deletionDate"`
 }
 
 // NodeStatus defines the observed state of Node
 type NodeStatus struct {
-	NodeProperties NodePropertiesStatusSpec `json:"nodeProperties,omitempty"`
-	//NodeServices     []NodeServicesStatusSpec    `json:"nodeServices,omitempty"`
+	NodeProperties   NodePropertiesStatusSpec    `json:"nodeProperties,omitempty"`
 	NodeHealthChecks []NodeHealthCheckStatusSpec `json:"nodeHealthChecks,omitempty"`
 }
 
@@ -74,6 +60,12 @@ type NodeStatus struct {
 // Node is the Schema for the nodes API
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Hostname",type="string",JSONPath=".spec.hostname",description="the node hostname"
+// +kubebuilder:printcolumn:name="Consul-ID",type="string",JSONPath=".status.nodeProperties.id",description="the Consul node ID"
+// +kubebuilder:printcolumn:name="Internal-IP",type="string",JSONPath=".status.nodeProperties.address",description="the node private IP"
+// +kubebuilder:printcolumn:name="External-IP",type="string",JSONPath=".status.nodeProperties.publicAddress",description="the node public IP"
+// +kubebuilder:printcolumn:name="OS-Image",type="string",JSONPath=".status.nodeProperties.image",description="the image deployed on node"
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 type Node struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -90,3 +82,4 @@ type NodeList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Node `json:"items"`
 }
+
